@@ -35,7 +35,7 @@ daemon=1
 EOF
 
 chmod 600 /var/lib/emc/.emercoin/emercoin.conf
-chown -R emс.emс /var/lib/emc/.emercoin
+chown -R emc.emc /var/lib/emc/.emercoin
 
 cat<<EOF >/usr/local/bin/emc
 #!/bin/sh
@@ -44,7 +44,7 @@ if [ ! \$1 ]; then
   echo "Please ensure you are allowed to run the sudo"
   exit 1
 fi
-sudo -u emc emercoind -datadir=/var/lib/emс/.emercoin \$*
+sudo -u emc emercoind -datadir=/var/lib/emc/.emercoin \$*
 EOF
 chmod +x /usr/local/bin/emc
 
