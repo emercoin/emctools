@@ -13,7 +13,7 @@ cp emercoin-0.3.7-linux/bin/64/emercoind /usr/local/bin
 rm -rf emercoin-0.3.7-linux
 
 mkdir /tmp/emcskel
-addgroup --gid 500 emс
+groupadd --gid 500 emс
 useradd -m -d /var/lib/emс -k /tmp/emcskel -s /bin/false --uid 500 --gid 500 emс
 rmdir /tmp/emcskel
 
