@@ -9,7 +9,7 @@ if [ ! -x /usr/local/sbin/emcssh ]; then echo "EMCSSH not found"; exit 1; fi
 if [ ! -d /usr/local/etc/emcssh_keys ]; then echo "EMCSSH not configured"; exit 1; fi
 getent passwd emc >/dev/null || { echo "User 'emc' not found"; exit 1; }
 
-apt-get -y install git pwgen python-pip apache2 libapache2-mod-wsgi
+apt-get -y install git pwgen python-dev python-pip apache2 libapache2-mod-wsgi
 pip install --upgrade pip
 pip install Flask
 pip install peewee
