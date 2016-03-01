@@ -17,8 +17,8 @@ groupadd --gid 500 emc
 useradd -m -d /var/lib/emc -k /tmp/emcskel -s /bin/false --uid 500 --gid 500 emc
 rmdir /tmp/emcskel
 
-mkdir -p /var/lib/emс/.emercoin
-cat<<EOF >/var/lib/emс/.emercoin/emercoin.conf
+mkdir -p /var/lib/emc/.emercoin
+cat<<EOF >/var/lib/emc/.emercoin/emercoin.conf
 rpcuser=emccoinrpc
 rpcpassword=`pwgen 50 1`
 listen=1
@@ -34,8 +34,8 @@ daemon=1
 #rpcsslciphers=HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4:!SSLv2
 EOF
 
-chmod 600 /var/lib/emс/.emercoin/emercoin.conf
-chown -R emс.emс /var/lib/emс/.emercoin
+chmod 600 /var/lib/emc/.emercoin/emercoin.conf
+chown -R emс.emс /var/lib/emc/.emercoin
 
 cat<<EOF >/usr/local/bin/emc
 #!/bin/sh
@@ -44,7 +44,7 @@ if [ ! \$1 ]; then
   echo "Please ensure you are allowed to run the sudo"
   exit 1
 fi
-sudo -u emercoin emercoind -datadir=/var/lib/emс/.emercoin \$*
+sudo -u emc emercoind -datadir=/var/lib/emс/.emercoin \$*
 EOF
 chmod +x /usr/local/bin/emc
 
