@@ -36,5 +36,6 @@ cp -f /var/lib/emcweb/emcssl_ca.crt /etc/ssl/certs/emcssl_ca.crt
 cp -f /var/lib/emcweb/emcweb.apache2.conf /etc/apache2/sites-available/emcweb.conf
 ln -s /etc/apache2/sites-available/emcweb.conf /etc/apache2/sites-enabled/emcweb.conf
 rm -f /etc/apache2/sites-enabled/default-ssl.conf
+rm -f /etc/apache2/sites-enabled/000-default.conf
 
 service apache2 restart
