@@ -9,12 +9,14 @@ if [ ! -x /usr/local/sbin/emcssh ]; then echo "EMCSSH not found"; exit 1; fi
 if [ ! -d /usr/local/etc/emcssh_keys ]; then echo "EMCSSH not configured"; exit 1; fi
 getent passwd emc >/dev/null || { echo "User 'emc' not found"; exit 1; }
 
-apt-get -y install git pwgen python-dev python-pip apache2 libapache2-mod-wsgi
+apt-get -y install git pwgen python-dev python-pip apache2 libapache2-mod-wsgi openssl
 pip install --upgrade pip
 pip install Flask
 pip install peewee
 a2enmod ssl
 a2enmod rewrite
+
+[ ! -f /etc/ssl/private/emcweb.key ] || [ ! -f /etc/ssl/certs/emcweb.crt ] && openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/ssl/private/emcweb.key -out /etc/ssl/certs/emcweb.crt -days 3560 -subj /C=US/ST=Oregon/L=Portland/O=IT/CN=emercoin.local
 
 touch /usr/local/etc/emcssh_keys/emcweb
 
@@ -30,6 +32,7 @@ cat<<EOF >/var/lib/emcweb/config/rpc
 }
 EOF
 
+chmod 600 /var/lib/emcweb/config/rpc
 chown -R emc.emc /var/lib/emcweb
 sed -i -e "s/gf6dfg87sfg7sf5gs4dfg5s7fgsd980n/`pwgen 30 1`/" /var/lib/emcweb/server.py
 cp -f /var/lib/emcweb/emcssl_ca.crt /etc/ssl/certs/emcssl_ca.crt
