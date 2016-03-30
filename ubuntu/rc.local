@@ -1,9 +1,24 @@
 #!/bin/sh -e
 
-[ ! -f /etc/ssl/private/emcweb.key ] || [ ! -f /etc/ssl/certs/emcweb.crt ] && openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/ssl/private/emcweb.key -out /etc/ssl/certs/emcweb.crt -days 3560 -subj /C=US/ST=Oregon/L=Portland/O=IT/CN=emercoin.local
+#
+# EMERCOIN INSTANCE
+# For reset the keys, run please:
+# rm -f /var/lib/emc/ssl/emercoin.key /var/lib/emcweb/server.py /var/lib/emc/.emercoin/emercoin.conf
+# reboot
+#
 
-[ -f /var/lib/emcweb/server.py.orig ] && cp -f /var/lib/emcweb/server.py.orig /var/lib/emcweb/server.py
-sed -i -e "s/gf6dfg87sfg7sf5gs4dfg5s7fgsd980n/`pwgen 30 1`/" /var/lib/emcweb/server.py
+
+[ ! -f /var/lib/emc/ssl/emercoin.key ] || [ ! -f /var/lib/emc/ssl/emercoin.crt ] && {
+  mkdir -p /var/lib/emc/ssl
+  openssl req -nodes -x509 -newkey rsa:4096 -keyout /var/lib/emc/ssl/emercoin.key -out /var/lib/emc/ssl/emercoin.crt -days 3560 -subj /C=US/ST=Oregon/L=Portland/O=IT/CN=emercoin.local
+}
+
+[ ! -f /var/lib/emcweb/server.py ] && [ -f /var/lib/emcweb/server.py.orig ] && {
+  cp -f /var/lib/emcweb/server.py.orig /var/lib/emcweb/server.py
+  sed -i -e "s/gf6dfg87sfg7sf5gs4dfg5s7fgsd980n/`pwgen 30 1`/" /var/lib/emcweb/server.py
+}
+
+[ -f /var/lib/emc/.emercoin/emercoin.conf ] && exit 0
 
 mkdir -p /var/lib/emc/.emercoin
 cat<<EOF >/var/lib/emc/.emercoin/emercoin.conf
@@ -16,16 +31,17 @@ rpcport=6662
 maxconnections=80
 gen=0
 daemon=1
-#rpcssl=1       # Use OpenSSL (https) for JSON-RPC connections
-#rpcsslcertificatechainfile=/var/lib/emc/emercoin.crt
-#rpcsslprivatekeyfile=/var/lib/emc/emercoin.key
-#rpcsslciphers=HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4:!SSLv2
+rpcssl=1
+rpcsslcertificatechainfile=/var/lib/emc/ssl/emercoin.crt
+rpcsslprivatekeyfile=/var/lib/emc/ssl/emercoin.key
+rpcsslciphers=HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4:!SSLv2
 EOF
 chmod 600 /var/lib/emc/.emercoin/emercoin.conf
 chown -R emc.emc /var/lib/emc/.emercoin
+/etc/init.d/emercoind restart
 
 cat<<EOF >/usr/local/etc/emcssh_config
-emcurl                  http://emccoinrpc:`grep rpcpassword /var/lib/emc/.emercoin/emercoin.conf | sed 's/rpcpassword=//'`@127.0.0.1:6662/
+emcurl                  https://emccoinrpc:`grep rpcpassword /var/lib/emc/.emercoin/emercoin.conf | sed 's/rpcpassword=//'`@127.0.0.1:6662/
 ssl_check               0
 verbose                 2
 maxkeys                 4096
@@ -35,18 +51,19 @@ EOF
 chmod 600 /usr/local/etc/emcssh_config
 chown root.root /usr/local/etc/emcssh_config
 
+[ ! -d /var/lib/emcweb ] && exit 0
+
 cat<<EOF >/var/lib/emcweb/config/rpc
 {
     "user": "emccoinrpc",
     "password": "`grep rpcpassword /var/lib/emc/.emercoin/emercoin.conf | sed 's/rpcpassword=//'`",
     "host": "127.0.0.1",
-    "port": "6662"
+    "port": "6662",
+    "ssl_verify": false
 }
 EOF
 chmod 600 /var/lib/emcweb/config/rpc
 chown emc.emc /var/lib/emcweb/config/rpc
-
 /etc/init.d/apache2 restart
-/etc/init.d/emercoind restart
 
 exit 0

@@ -16,13 +16,12 @@ cd emcssh-0.0.3
 mv emcssh_config emcssh_config.orig
 
 cat<<EOF >emcssh_config
-emcurl                  http://emccoinrpc:`grep rpcpassword /var/lib/emc/.emercoin/emercoin.conf | sed 's/rpcpassword=//'`@127.0.0.1:6662/
+emcurl                  https://emccoinrpc:`grep rpcpassword /var/lib/emc/.emercoin/emercoin.conf | sed 's/rpcpassword=//'`@127.0.0.1:6662/
 ssl_check               0
 verbose                 2
 maxkeys                 4096
 emcssh_keys             /usr/local/etc/emcssh_keys/\$U
 recursion               10
-
 EOF
 
 make

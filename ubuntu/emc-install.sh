@@ -4,7 +4,7 @@
 if [ `whoami` != 'root' ]; then echo "Run me as root"; exit 1; fi
 getent passwd emc >/dev/null && { echo "User 'emc' already exists"; exit 1; }
 
-apt-get -y install wget pwgen
+apt-get -y install wget pwgen openssl
 
 wget https://dl.dropboxusercontent.com/u/15852900/emercoin/emercoin-0.3.7-linux.tar.gz
 tar xvzf emercoin-0.3.7-linux.tar.gz
@@ -17,6 +17,9 @@ groupadd --gid 500 emc
 useradd -m -d /var/lib/emc -k /tmp/emcskel -s /bin/false --uid 500 --gid 500 emc
 rmdir /tmp/emcskel
 
+mkdir -p /var/lib/emc/ssl
+openssl req -nodes -x509 -newkey rsa:4096 -keyout /var/lib/emc/ssl/emercoin.key -out /var/lib/emc/ssl/emercoin.crt -days 3560 -subj /C=US/ST=Oregon/L=Portland/O=IT/CN=emercoin.local
+
 mkdir -p /var/lib/emc/.emercoin
 cat<<EOF >/var/lib/emc/.emercoin/emercoin.conf
 rpcuser=emccoinrpc
@@ -28,10 +31,10 @@ rpcport=6662
 maxconnections=80
 gen=0
 daemon=1
-#rpcssl=1       # Use OpenSSL (https) for JSON-RPC connections
-#rpcsslcertificatechainfile=/var/lib/emc/emercoin.crt
-#rpcsslprivatekeyfile=/var/lib/emc/emercoin.key
-#rpcsslciphers=HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4:!SSLv2
+rpcssl=1
+rpcsslcertificatechainfile=/var/lib/emc/ssl/emercoin.crt
+rpcsslprivatekeyfile=/var/lib/emc/ssl/emercoin.key
+rpcsslciphers=HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4:!SSLv2
 EOF
 
 chmod 600 /var/lib/emc/.emercoin/emercoin.conf

@@ -28,14 +28,19 @@ cat<<EOF >/var/lib/emcweb/config/rpc
     "user": "emccoinrpc",
     "password": "`grep rpcpassword /var/lib/emc/.emercoin/emercoin.conf | sed 's/rpcpassword=//'`",
     "host": "127.0.0.1",
-    "port": "6662"
+    "port": "6662",
+	"ssl_verify": false
 }
 EOF
 
 chmod 600 /var/lib/emcweb/config/rpc
 chown -R emc.emc /var/lib/emcweb
+
+cp -f /var/lib/emcweb/server.py /var/lib/emcweb/server.py.orig
 sed -i -e "s/gf6dfg87sfg7sf5gs4dfg5s7fgsd980n/`pwgen 30 1`/" /var/lib/emcweb/server.py
-cp -f /var/lib/emcweb/emcssl_ca.crt /etc/ssl/certs/emcssl_ca.crt
+
+mkdir -p /var/lib/emc/ssl
+cp -f /var/lib/emcweb/emcssl_ca.crt /var/lib/emc/ssl
 cp -f /var/lib/emcweb/emcweb.apache2.conf /etc/apache2/sites-available/emcweb.conf
 ln -s /etc/apache2/sites-available/emcweb.conf /etc/apache2/sites-enabled/emcweb.conf
 rm -f /etc/apache2/sites-enabled/default-ssl.conf
