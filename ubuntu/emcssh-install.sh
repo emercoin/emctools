@@ -36,4 +36,5 @@ AuthorizedKeysCommand /usr/local/sbin/emcssh
 AuthorizedKeysCommandUser root
 EOF
 
+rm -rf emcssh-0.0.3
 service ssh restart
