@@ -47,3 +47,10 @@ rm -f /etc/apache2/sites-enabled/default-ssl.conf
 rm -f /etc/apache2/sites-enabled/000-default.conf
 
 service apache2 restart
+
+cat<<EOF >/usr/local/bin/md5
+#!/bin/bash
+echo -n "$1" | md5sum | cut -f1 -d ' '
+EOF
+
+chmod +x /usr/local/bin/md5
